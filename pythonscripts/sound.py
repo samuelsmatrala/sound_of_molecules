@@ -5,7 +5,7 @@ def scale_to_range(x, x_min = -8 , x_max = -0.005, new_min=82.41, new_max=329.63
     return (x - x_min) / (x_max - x_min) * (new_max - new_min) + new_min
 def sound(sequence, energies):
     SAMPLE_RATE = 44100
-    TONE_DURATION = 0.3
+    TONE_DURATION = 0.25
     
     FREQUENCIES = {
         0: 0,

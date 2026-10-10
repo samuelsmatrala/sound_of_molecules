@@ -12,10 +12,14 @@ def main(backend, molecule = "H3+"):
   from pythonscripts.sound import sound
   
   #PROGRAM
-  MOLECULES = ["H3+", "H2", "H2+", "HeH+", "Li+", "H4"]
-  qpe_result = QPE(backend = backend, SELECTED_MOLECULE = MOLECULES[0])
+  MOLECULES = {"H3+", "H2", "H2+", "HeH+", "Li+", "H4"}
+  if molecule not in MOLECULES:
+    molecule = "H3+"
+  qpe_output = QPE(backend = backend, SELECTED_MOLECULE = molecule)
+  qpe_result = qpe_output.get("result", "")
+  qpe_energies = qpe_output.get("energies", [])
   mol_frequency = molecule_frequency(backend = backend)
-  audio_data = sound(mol_frequency) # Predpokladáme, že sound() vracia slovník {"audio": [...], "sampleRate": 44100}
+  audio_data = sound(mol_frequency, qpe_energies)
   
   # Vráťme všetko pekne do JS ako slovník
   return {

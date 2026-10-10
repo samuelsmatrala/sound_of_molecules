@@ -4,7 +4,7 @@ from qiskit import QuantumCircuit
 def molecule_frequency(backend):
   num = 30
   qc = QuantumCircuit(1, 1)
-  qc.ry(np.pi/3,0)
+  qc.ry(np.pi/2,0)
   qc.measure(0, 0)
   print(qc)
   

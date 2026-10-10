@@ -1,14 +1,17 @@
 import numpy as np
-
-def sound(sequence):
+def scale_to_range(x, x_min = -8 , x_max = -0.005, new_min=82.41, new_max=329.63):
+    if x_max == x_min:
+        return new_min
+    return (x - x_min) / (x_max - x_min) * (new_max - new_min) + new_min
+def sound(sequence, energies):
     SAMPLE_RATE = 44100
     TONE_DURATION = 0.3
     
     FREQUENCIES = {
         0: 0,
-        1: 440.0,    # A4
-        2: 554.37,   # C#5
-        3: 659.25    # E5
+        1: scale_to_range(energies[0]),
+        2: scale_to_range(energies[1]),
+        3: scale_to_range(energies[2]),
     }
     
     def create_signal(freq, duration, sr):

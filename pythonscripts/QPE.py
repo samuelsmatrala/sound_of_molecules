@@ -12,6 +12,7 @@ from qiskit.synthesis import SuzukiTrotter
 #FUNCTIONS
 def QPE(backend, SELECTED_MOLECULE):
   result = ""
+  energies = []
   # 1. MOLECULE SELECTION
   
   MOLECULE_CONFIGS = {
@@ -48,10 +49,10 @@ def QPE(backend, SELECTED_MOLECULE):
   total_qubits = num_system_qubits + NUM_EVAL_QUBITS
   nuclear_rep = problem.nuclear_repulsion_energy
   
-  result+=("\n   MOLECULAR QUBITS (AFTER 2-QUBIT REDUCTION): {num_system_qubits}")
-  result+=("\n   EVALUATION QUBITS: {NUM_EVAL_QUBITS}")
-  result+=("\n   TOTAL # OF QUBITS: {total_qubits}")
-  result+=("\n   REPULSION: {nuclear_rep:.5f} HARTREE")
+  result+=("\n   MOLECULAR QUBITS (AFTER 2-QUBIT REDUCTION): "+str(num_system_qubits))
+  result+=("\n   EVALUATION QUBITS: "+str(NUM_EVAL_QUBITS))
+  result+=("\n   TOTAL # OF QUBITS: "+str(total_qubits))
+  result+=("\n   REPULSION: "+str(nuclear_rep)+" HARTREE")
   
   # 3. HELPER FUNCTION FOR RUNNING QPE IN QOLLAB
   
@@ -135,12 +136,16 @@ def QPE(backend, SELECTED_MOLECULE):
       res = run_qpe_for_state(circuit, name)
       dt = time.time() - t0
       qpe_results.append(res)
-      result+=("\n   [COMPLETED in {dt:.1f}s] {name} -> Bitstring: {res[1]}, QPE Energy: {res[2]:.4f} Hartree")
+      result+=("\n   [COMPLETED in "+str(dt)+"s] {name} -> Bitstring: "+str(res[1])+", QPE Energy: "+str(res[2])+" Hartree")
+      energies.append(res[2])
   
   result+=("\n" + "="*55)
-  result+=("\n{'Energy level':<25} | {'Bitstring':<10} | {'Measured E (QPE)'}")
+  result+=("\n"+str('Energy level')+" | "+str('Bitstring') +"| "+str('Measured E (QPE)'))
   result+=("\n"+"="*55)
   for name, bitstr, qpe_e in qpe_results:
-      result+=("\n{name:<25} | {bitstr:<10} | {qpe_e:.4f} Hartree")
+      result+=("\n"+str(name)+" | "+str(bitstr)+" | "+str(qpe_e)+" Hartree")
   result+=("\n"+"="*55)
-  return result
+  return {
+    "result" : result,
+    "energies" : energies,
+  }

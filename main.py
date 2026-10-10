@@ -9,4 +9,5 @@ else:
 from QPE import QPE
 
 #PROGRAM
-QPE(backend = backend)
+MOLECULES = ["H2", "H2+", "HeH+", "He", "Li+"]
+QPE(backend = backend, SELECTED_MOLECULE = MOLECULES[0])

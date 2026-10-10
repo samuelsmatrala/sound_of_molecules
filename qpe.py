@@ -10,10 +10,8 @@ from qiskit.circuit.library import PauliEvolutionGate, QFT
 from qiskit.synthesis import SuzukiTrotter
 
 #FUNCTIONS
-def QPE(backend):
+def QPE(backend, SELECTED_MOLECULE):
   # 1. MOLECULE SELECTION
-  
-  SELECTED_MOLECULE = "H2"
   
   MOLECULE_CONFIGS = {
       "H2":   {"atom": "H 0.0 0.0 0.0; H 0.0 0.0 0.735", "charge": 0, "spin": 0, "basis": "sto-3g"},

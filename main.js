@@ -1,77 +1,152 @@
-import * as pyModule from 'pythonscripts.main';
-
-let audioCtx = null;
-
-function playAudio(audioData, sampleRate) {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!audioCtx) audioCtx = new AudioContext();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-
-    const buffer = audioCtx.createBuffer(1, audioData.length, sampleRate);
-    const channelData = buffer.getChannelData(0);
-    for (let i = 0; i < audioData.length; i++) {
-        channelData[i] = audioData[i];
-    }
-
-    const source = audioCtx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(audioCtx.destination);
-    source.start(0);
-}
-
-async function quantumRun(molecule) {
-    if (typeof backend === 'undefined') {
-        throw new Error("Backend nie je dostupný! Spustite projekt cez tlačidlo Run.");
-    }
-
-    console.log(`Spúšťam main pre molekulu: ${molecule}`);
-    const result = await pyModule.main.callPromising(backend, molecule);
-    const data = result.toJs ? result.toJs() : result;
-    console.log("Výsledok:", data);
-
-    if (data && data.audio && data.sampleRate) {
-        playAudio(data.audio, data.sampleRate);
-    } else {
-        console.warn("Výsledok neobsahuje audio dáta alebo sampleRate.");
-    }
-    return data;
-}
-
-async function onRunClick() {
-    const statusDiv = document.getElementById('status');
-    const btn = document.getElementById('runBtn');
-    const out = document.getElementById('qpeOutput');
-    const checked = document.querySelector('input[name="molecule"]:checked');
-    const molecule = checked ? checked.value : "H3+";
-
-    btn.disabled = true;
-    out.style.display = "none";
-    statusDiv.textContent = `Počítam obvod pre ${molecule}... (môže chvíľu trvať)`;
-
-    try {
-        const data = await quantumRun(molecule);
-        statusDiv.textContent = `Hotovo! Prehráva sa melódia pre ${molecule}.`;
-        if (data && data.qpe) {
-            out.textContent = data.qpe;
-            out.style.display = "block";
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Musiq — Quantum Sonic Studio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
-    } catch (err) {
-        console.error(err);
-        statusDiv.textContent = "Chyba pri výpočte: " + err;
-    } finally {
-        btn.disabled = false;
-    }
-}
+        #bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-size: cover;
+            background-image: linear-gradient(135deg, #0f172a, #1e3a8a);
+            transition: background-image 0.4s ease;
+        }
+        body:has(input[value="H3+"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #1e3a8a); }
+        body:has(input[value="H2"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #065f46); }
+        body:has(input[value="H2+"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #6d28d9); }
+        body:has(input[value="HeH+"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #9d174d); }
+        body:has(input[value="Li+"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #b45309); }
+        body:has(input[value="H4"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #0e7490); }
 
-function init() {
-    const btn = document.getElementById('runBtn');
-    if (btn) btn.addEventListener('click', onRunClick);
-}
+        .container {
+            background-color: rgba(30, 41, 59, 0.92);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            width: 640px;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        h1 { color: #38bdf8; margin: 0 0 10px; font-size: 24px; }
+        p { color: #94a3b8; font-size: 14px; margin: 0 0 20px; }
 
-window.quantumRun = quantumRun;
+        #moleculeGrid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        @media (max-width: 520px) {
+            #moleculeGrid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .mol-label { display: block; cursor: pointer; position: relative; }
+        .mol-label input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .mol-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 6px 8px;
+            border-radius: 10px;
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 2px solid transparent;
+            transition: border-color 0.2s, background-color 0.2s, transform 0.15s;
+        }
+        .mol-label:hover .mol-card { background-color: rgba(51, 65, 85, 0.8); transform: translateY(-2px); }
+        .mol-label input:checked + .mol-card { border-color: #38bdf8; background-color: rgba(14, 165, 233, 0.18); }
+        .mol-label input:focus-visible + .mol-card { outline: 2px solid #fbbf24; }
+        .mol-card svg { width: 100%; height: 70px; }
+        .mol-card span { margin-top: 6px; font-weight: bold; font-size: 16px; color: #e2e8f0; }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-} else {
-    init();
-}
+        #runBtn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 18px;
+            border-radius: 6px;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #0ea5e9;
+            color: white;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        #runBtn:hover { background-color: #0284c7; }
+        #runBtn:disabled { background-color: #475569; cursor: wait; }
+        #status { margin-top: 15px; font-size: 13px; color: #fbbf24; }
+        #qpeOutput {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            max-height: 200px;
+            overflow: auto;
+            text-align: left;
+            font-size: 11px;
+            background: #0f172a;
+            color: #94a3b8;
+            border-radius: 6px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="bg"></div>
+
+    <div class="container">
+        <h1>Musiq Studio</h1>
+        <p>Preveďte kvantový obvod na zvuk a melódiu. Kliknite na molekulu.</p>
+
+        <div id="moleculeGrid">
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="H3+" checked>
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><line x1="83.2" y1="50" x2="132.8" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><line x1="132.8" y1="50" x2="176.8" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><circle cx="83.2" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="83.2" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="132.8" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="132.8" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="176.8" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="176.8" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><text x="248" y="18" font-family="Arial" font-size="18" font-weight="bold" fill="#fbbf24" text-anchor="end">+</text></svg><span>H3+</span></div>
+            </label>
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="H2">
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><line x1="109.8" y1="50" x2="150.2" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><circle cx="109.8" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="109.8" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="150.2" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="150.2" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text></svg><span>H2</span></div>
+            </label>
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="H2+">
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><line x1="100.8" y1="50" x2="159.2" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><circle cx="100.8" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="100.8" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="159.2" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="159.2" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><text x="248" y="18" font-family="Arial" font-size="18" font-weight="bold" fill="#fbbf24" text-anchor="end">+</text></svg><span>H2+</span></div>
+            </label>
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="HeH+">
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><line x1="108.8" y1="50" x2="151.2" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><circle cx="108.8" cy="50" r="18" fill="#fdba74" stroke="#0ea5e9" stroke-width="2"/><text x="108.8" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">He</text><circle cx="151.2" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="151.2" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><text x="248" y="18" font-family="Arial" font-size="18" font-weight="bold" fill="#fbbf24" text-anchor="end">+</text></svg><span>HeH+</span></div>
+            </label>
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="Li+">
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><circle cx="130.0" cy="50" r="24" fill="#c084fc" stroke="#0ea5e9" stroke-width="2"/><text x="130.0" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">Li</text><text x="248" y="18" font-family="Arial" font-size="18" font-weight="bold" fill="#fbbf24" text-anchor="end">+</text></svg><span>Li+</span></div>
+            </label>
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="H4">
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><line x1="47.5" y1="50" x2="102.5" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><line x1="102.5" y1="50" x2="157.5" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><line x1="157.5" y1="50" x2="212.5" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><circle cx="47.5" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="47.5" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="102.5" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="102.5" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="157.5" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="157.5" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="212.5" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="212.5" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text></svg><span>H4</span></div>
+            </label>
+        </div>
+
+        <button id="runBtn" type="button">Spustiť kvantový výpočet</button>
+
+        <div id="status">Pripravené na spustenie.</div>
+        <pre id="qpeOutput"></pre>
+    </div>
+
+    <!-- Žiadny inline skript: logika tlačidla je v main.js -->
+</body>
+</html>

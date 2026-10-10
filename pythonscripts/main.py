@@ -9,7 +9,18 @@ def main(backend):
   #IMPORTS
   from pythonscripts.QPE import QPE 
   from pythonscripts.molecule_frequency import molecule_frequency
+  from pythonscripts.sound import sound
   
   #PROGRAM
   MOLECULES = ["H3+", "H2", "H2+", "HeH+", "Li+", "H4"]
-  return QPE(backend = backend, SELECTED_MOLECULE = MOLECULES[0]), molecule_frequency(backend = backend)
+  qpe_result = QPE(backend = backend, SELECTED_MOLECULE = MOLECULES[0])
+  mol_frequency = molecule_frequency(backend = backend)
+  audio_data = sound() # Predpokladáme, že sound() vracia slovník {"audio": [...], "sampleRate": 44100}
+  
+  # Vráťme všetko pekne do JS ako slovník
+  return {
+      "qpe": qpe_result,
+      "moleculeFrequency": mol_frequency,
+      "audio": audio_data["audio"],
+      "sampleRate": audio_data["sampleRate"]
+  }

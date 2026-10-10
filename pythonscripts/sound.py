@@ -1,6 +1,6 @@
 import numpy as np
 
-def sound():
+def sound(sequence):
     SAMPLE_RATE = 44100
     TONE_DURATION = 0.3
     
@@ -10,8 +10,6 @@ def sound():
         2: 554.37,   # C#5
         3: 659.25    # E5
     }
-    
-    sequence = [0, 1, 0, 2, 0, 3, 0, 1, 2, 3, 0]
     
     def create_signal(freq, duration, sr):
         t = np.linspace(0, duration, int(sr * duration), endpoint=False)

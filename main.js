@@ -48,8 +48,8 @@ try {
             source.start(0);
             
             console.log("🎵 Zvuk úspešne spustený v prehliadači!");
-            console.log("QPE:<\n", data.qpe_result);
-            console.log("Mol Fre:\n", data.mol_frequency);
+            console.log("QPE:<\n", data.qpe);
+            console.log("Mol Fre:\n", data.moleculeFrequency);
         } else {
             console.warn("Výsledok neobsahuje audio dáta alebo sampleRate.");
         }

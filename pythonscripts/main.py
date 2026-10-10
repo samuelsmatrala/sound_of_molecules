@@ -15,7 +15,7 @@ def main(backend):
   MOLECULES = ["H3+", "H2", "H2+", "HeH+", "Li+", "H4"]
   qpe_result = QPE(backend = backend, SELECTED_MOLECULE = MOLECULES[0])
   mol_frequency = molecule_frequency(backend = backend)
-  audio_data = sound() # Predpokladáme, že sound() vracia slovník {"audio": [...], "sampleRate": 44100}
+  audio_data = sound(mol_frequency) # Predpokladáme, že sound() vracia slovník {"audio": [...], "sampleRate": 44100}
   
   # Vráťme všetko pekne do JS ako slovník
   return {

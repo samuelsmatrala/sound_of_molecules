@@ -14,4 +14,4 @@ def molecule_frequency(backend):
       vysledky = np.array(job.result().get_memory(), dtype=int)
       suma += vysledky
   
-  print(suma)
+  return suma

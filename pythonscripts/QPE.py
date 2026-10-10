@@ -11,6 +11,7 @@ from qiskit.synthesis import SuzukiTrotter
 
 #FUNCTIONS
 def QPE(backend, SELECTED_MOLECULE):
+  result = ""
   # 1. MOLECULE SELECTION
   
   MOLECULE_CONFIGS = {
@@ -47,10 +48,10 @@ def QPE(backend, SELECTED_MOLECULE):
   total_qubits = num_system_qubits + NUM_EVAL_QUBITS
   nuclear_rep = problem.nuclear_repulsion_energy
   
-  print(f"   MOLECULAR QUBITS (AFTER 2-QUBIT REDUCTION): {num_system_qubits}")
-  print(f"   EVALUATION QUBITS: {NUM_EVAL_QUBITS}")
-  print(f"   TOTAL # OF QUBITS: {total_qubits}")
-  print(f"   REPULSION: {nuclear_rep:.5f} HARTREE")
+  result+=("\n   MOLECULAR QUBITS (AFTER 2-QUBIT REDUCTION): {num_system_qubits}")
+  result+=("\n   EVALUATION QUBITS: {NUM_EVAL_QUBITS}")
+  result+=("\n   TOTAL # OF QUBITS: {total_qubits}")
+  result+=("\n   REPULSION: {nuclear_rep:.5f} HARTREE")
   
   # 3. HELPER FUNCTION FOR RUNNING QPE IN QOLLAB
   
@@ -126,7 +127,7 @@ def QPE(backend, SELECTED_MOLECULE):
   
   # 5. EXECUTION AND SUMMARY OF RESULTS
   
-  print(f"\nStarting the QPE calculation for E0, E1, E2 on Qollab...\n")
+  result+=("\n\nStarting the QPE calculation for E0, E1, E2 on Qollab...\n")
   
   qpe_results = []
   for circuit, name in states_to_test:
@@ -134,11 +135,12 @@ def QPE(backend, SELECTED_MOLECULE):
       res = run_qpe_for_state(circuit, name)
       dt = time.time() - t0
       qpe_results.append(res)
-      print(f"   [COMPLETED in {dt:.1f}s] {name} -> Bitstring: {res[1]}, QPE Energy: {res[2]:.4f} Hartree")
+      result+=("\n   [COMPLETED in {dt:.1f}s] {name} -> Bitstring: {res[1]}, QPE Energy: {res[2]:.4f} Hartree")
   
-  print("\n" + "="*55)
-  print(f"{'Energy level':<25} | {'Bitstring':<10} | {'Measured E (QPE)'}")
-  print("="*55)
+  result+=("\n" + "="*55)
+  result+=("\n{'Energy level':<25} | {'Bitstring':<10} | {'Measured E (QPE)'}")
+  result+=("\n"+"="*55)
   for name, bitstr, qpe_e in qpe_results:
-      print(f"{name:<25} | {bitstr:<10} | {qpe_e:.4f} Hartree")
-  print("="*55)
+      result+=("\n{name:<25} | {bitstr:<10} | {qpe_e:.4f} Hartree")
+  result+=("\n"+"="*55)
+  return result

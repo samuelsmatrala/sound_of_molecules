@@ -1,4 +1,5 @@
 import * as pyModule from 'pythonscripts.main';
+import { MOLECULE_INFO } from './molecule_info.js';
 
 let audioCtx = null;
 
@@ -63,9 +64,29 @@ async function onRunClick() {
     }
 }
 
+function onMoleculeChange(input) {
+    const molecule = input.value;
+    const moleculeInfo = MOLECULE_INFO[molecule];
+    dispalyMoleculeInfo(moleculeInfo);
+}
+
+function dispalyMoleculeInfo(molecule) {
+    const infoDiv = document.querySelector('.molecule-info');
+    infoDiv.innerHTML = `
+    <h3>${molecule.name}</h3>
+    <p><b>Description:</b> ${molecule.description}</p>
+    <p><b>Occurrence:</b> ${molecule.occurrence}</p>
+    <p><b>Uses:</b> ${molecule.uses}</p>
+    `;
+}
+
 function init() {
     const btn = document.getElementById('runBtn');
     if (btn) btn.addEventListener('click', onRunClick);
+    const moleculeDiv = document.querySelectorAll('input[name="molecule"]');
+    if (moleculeDiv) moleculeDiv.forEach(input => input.addEventListener('input', () => {
+        onMoleculeChange(input);
+    }));
 }
 
 window.quantumRun = quantumRun;

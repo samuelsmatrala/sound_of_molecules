@@ -8,11 +8,11 @@ def molecule_frequency(backend):
   qc.measure(0, 0)
   print(qc)
   
-  suma = np.zeros(num, dtype=int)
+  sequence_rythm = np.zeros(num, dtype=int)
   
   for i in range(3):
       job = backend.run(qc, shots=num, memory=True)
       vysledky = np.array(job.result().get_memory(), dtype=int)
-      suma += vysledky
+      sequence_rythm += vysledky
   
-  return suma
+  return sequence_rythm

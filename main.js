@@ -21,18 +21,18 @@ function playAudio(audioData, sampleRate) {
 
 async function quantumRun(molecule) {
     if (typeof backend === 'undefined') {
-        throw new Error("Backend nie je dostupný! Spustite projekt cez tlačidlo Run.");
+        throw new Error("Backend is not available! Please run the project using the Run button.");
     }
 
-    console.log(`Spúšťam main pre molekulu: ${molecule}`);
+    console.log(`Running main for molecule: ${molecule}`);
     const result = await pyModule.main.callPromising(backend, molecule);
     const data = result.toJs ? result.toJs() : result;
-    console.log("Výsledok:", data);
+    console.log("Result:", data);
 
     if (data && data.audio && data.sampleRate) {
         playAudio(data.audio, data.sampleRate);
     } else {
-        console.warn("Výsledok neobsahuje audio dáta alebo sampleRate.");
+        console.warn("Result does not contain audio data or sampleRate.");
     }
     return data;
 }
@@ -46,18 +46,18 @@ async function onRunClick() {
 
     btn.disabled = true;
     out.style.display = "none";
-    statusDiv.textContent = `Počítam obvod pre ${molecule}... (môže chvíľu trvať)`;
+    statusDiv.textContent = `Computing circuit for ${molecule}... (this may take a moment)`;
 
     try {
         const data = await quantumRun(molecule);
-        statusDiv.textContent = `Hotovo! Prehráva sa melódia pre ${molecule}.`;
+        statusDiv.textContent = `Done! Playing melody for ${molecule}.`;
         if (data && data.qpe) {
             out.textContent = data.qpe;
             out.style.display = "block";
         }
     } catch (err) {
         console.error(err);
-        statusDiv.textContent = "Chyba pri výpočte: " + err;
+        statusDiv.textContent = "Error during calculation: " + err;
     } finally {
         btn.disabled = false;
     }

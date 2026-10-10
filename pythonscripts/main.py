@@ -1,4 +1,4 @@
-def main(backend):
+def main(backend, molecule = "H3+"):
   # NOTE: 'backend' is pre-created as a global variable
   if 'backend' in globals():
       backend = globals()['backend']
@@ -19,6 +19,7 @@ def main(backend):
   
   # Vráťme všetko pekne do JS ako slovník
   return {
+      "molecule": molecule,
       "qpe": qpe_result,
       "moleculeFrequency": mol_frequency,
       "audio": audio_data["audio"],

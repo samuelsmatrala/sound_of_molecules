@@ -10,6 +10,6 @@ from QPE import QPE
 from molecule_frequency import molecule_frequency
 
 #PROGRAM
-MOLECULES = ["H2", "H2+", "HeH+", "He", "Li+"]
+MOLECULES = ["H3+", "H2", "H2+", "HeH+", "Li+", "H4"]
 QPE(backend = backend, SELECTED_MOLECULE = MOLECULES[0])
 molecule_frequency(backend = backend)

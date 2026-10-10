@@ -14,12 +14,12 @@ def QPE(backend, SELECTED_MOLECULE):
   # 1. MOLECULE SELECTION
   
   MOLECULE_CONFIGS = {
-      "H2":   {"atom": "H 0.0 0.0 0.0; H 0.0 0.0 0.735", "charge": 0, "spin": 0, "basis": "sto-3g"},
-      "H2+":  {"atom": "H 0.0 0.0 0.0; H 0.0 0.0 1.06",  "charge": 1, "spin": 1, "basis": "sto-3g"},
-      "HeH+": {"atom": "He 0.0 0.0 0.0; H 0.0 0.0 0.772", "charge": 1, "spin": 0, "basis": "sto-3g"},
-      "He":   {"atom": "He 0.0 0.0 0.0",                 "charge": 0, "spin": 0, "basis": "sto-3g"},
-      "Li+":  {"atom": "Li 0.0 0.0 0.0",                 "charge": 1, "spin": 0, "basis": "sto-3g"}
-  }
+    "H3+":  {"atom": "H 0.0 0.0 0.0; H 0.0 0.0 0.9; H 0.0 0.0 1.7", "charge": 1, "spin": 0, "basis": "sto-3g"},
+    "H2":   {"atom": "H 0.0 0.0 0.0; H 0.0 0.0 0.735", "charge": 0, "spin": 0, "basis": "sto-3g"},
+    "H2+":  {"atom": "H 0.0 0.0 0.0; H 0.0 0.0 1.06",  "charge": 1, "spin": 1, "basis": "sto-3g"},
+    "HeH+": {"atom": "He 0.0 0.0 0.0; H 0.0 0.0 0.772", "charge": 1, "spin": 0, "basis": "sto-3g"},
+    "Li+":  {"atom": "Li 0.0 0.0 0.0",                 "charge": 1, "spin": 0, "basis": "sto-3g"},
+    "H4":   {"atom": "H 0.0 0.0 0.0; H 0.0 0.0 1.0; H 0.0 0.0 2.0; H 0.0 0.0 3.0", "charge": 0, "spin": 0,"basis": "sto-3g"},}
   
   cfg = MOLECULE_CONFIGS[SELECTED_MOLECULE]
   

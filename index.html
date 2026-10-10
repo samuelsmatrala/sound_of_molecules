@@ -12,92 +12,97 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
-
         #bg {
             position: fixed;
             inset: 0;
             z-index: -1;
             background-size: cover;
-            background-position: center;
-            transition: opacity 0.4s ease;
+            background-image: linear-gradient(135deg, #0f172a, #1e3a8a);
+            transition: background-image 0.4s ease;
         }
-        #bg.fade {
-            opacity: 0;
-        }
+        body:has(input[value="H3+"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #1e3a8a); }
+        body:has(input[value="H2"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #065f46); }
+        body:has(input[value="H2+"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #6d28d9); }
+        body:has(input[value="HeH+"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #9d174d); }
+        body:has(input[value="Li+"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #b45309); }
+        body:has(input[value="H4"]:checked) #bg { background-image: linear-gradient(135deg, #0f172a, #0e7490); }
 
         .container {
-            position: relative;
             background-color: rgba(30, 41, 59, 0.92);
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
             text-align: center;
-            width: 400px;
+            width: 640px;
+            max-width: 100%;
+            box-sizing: border-box;
         }
-        h1 {
-            color: #38bdf8;
-            margin-bottom: 10px;
-            font-size: 24px;
-        }
-        p {
-            color: #94a3b8;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
+        h1 { color: #38bdf8; margin: 0 0 10px; font-size: 24px; }
+        p { color: #94a3b8; font-size: 14px; margin: 0 0 20px; }
 
-        .select-row {
-            display: flex;
-            align-items: center;
+        #moleculeGrid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            margin-top: 10px;
         }
-        .select-row select {
-            flex: 1;
-            width: auto;
-            margin-top: 0;
+        @media (max-width: 520px) {
+            #moleculeGrid { grid-template-columns: repeat(2, 1fr); }
         }
-        #moleculeImg {
-            width: 56px;
-            height: 56px;
-            object-fit: contain;
-            border-radius: 8px;
-            background-color: #334155;
-            flex-shrink: 0;
+        .mol-label { display: block; cursor: pointer; position: relative; }
+        .mol-label input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
         }
+        .mol-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 6px 8px;
+            border-radius: 10px;
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 2px solid transparent;
+            transition: border-color 0.2s, background-color 0.2s, transform 0.15s;
+        }
+        .mol-label:hover .mol-card { background-color: rgba(51, 65, 85, 0.8); transform: translateY(-2px); }
+        .mol-label input:checked + .mol-card { border-color: #38bdf8; background-color: rgba(14, 165, 233, 0.18); }
+        .mol-label input:focus-visible + .mol-card { outline: 2px solid #fbbf24; }
+        .mol-card svg { width: 100%; height: 70px; }
+        .mol-card span { margin-top: 6px; font-weight: bold; font-size: 16px; color: #e2e8f0; }
 
-        select, button {
+        #runBtn {
             width: 100%;
             padding: 12px;
-            margin-top: 10px;
+            margin-top: 18px;
             border-radius: 6px;
             border: none;
             font-size: 16px;
             cursor: pointer;
-        }
-        select {
-            background-color: #334155;
-            color: white;
-        }
-        button {
             background-color: #0ea5e9;
             color: white;
             font-weight: bold;
             transition: background 0.2s;
         }
-        button:hover {
-            background-color: #0284c7;
-        }
-        #status {
+        #runBtn:hover { background-color: #0284c7; }
+        #runBtn:disabled { background-color: #475569; cursor: wait; }
+        #status { margin-top: 15px; font-size: 13px; color: #fbbf24; }
+        #qpeOutput {
+            display: none;
             margin-top: 15px;
-            font-size: 13px;
-            color: #fbbf24;
-        }
-        audio {
-            width: 100%;
-            margin-top: 15px;
+            padding: 10px;
+            max-height: 200px;
+            overflow: auto;
+            text-align: left;
+            font-size: 11px;
+            background: #0f172a;
+            color: #94a3b8;
+            border-radius: 6px;
+            white-space: pre-wrap;
         }
     </style>
 </head>
@@ -106,99 +111,41 @@
     <div id="bg"></div>
 
     <div class="container">
-        <h1>Sound of Molecules</h1>
-        <p>Preveďte molekuly na zvuk a melódiu.</p>
+        <h1>Sound of molecules</h1>
+        <p>Preveďte kvantový obvod na zvuk a melódiu. Kliknite na molekulu.</p>
 
-        <label for="moleculeSelect">Vyberte molekulu:</label>
-
-        <div class="select-row">
-            <select id="moleculeSelect" onchange="updateMolecule()">
-                <option value="H3+">H3+</option>
-                <option value="H2">H2</option>
-                <option value="H2+">H2+</option>
-                <option value="HeH+">HeH+</option>
-                <option value="Li+">Li+</option>
-                <option value="H4">H4</option>
-            </select>
-            <img id="moleculeImg" src="" alt="Molekula">
+        <div id="moleculeGrid">
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="H3+" checked>
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><line x1="83.2" y1="50" x2="132.8" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><line x1="132.8" y1="50" x2="176.8" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><circle cx="83.2" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="83.2" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="132.8" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="132.8" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="176.8" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="176.8" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><text x="248" y="18" font-family="Arial" font-size="18" font-weight="bold" fill="#fbbf24" text-anchor="end">+</text></svg><span>H3+</span></div>
+            </label>
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="H2">
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><line x1="109.8" y1="50" x2="150.2" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><circle cx="109.8" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="109.8" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="150.2" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="150.2" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text></svg><span>H2</span></div>
+            </label>
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="H2+">
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><line x1="100.8" y1="50" x2="159.2" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><circle cx="100.8" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="100.8" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="159.2" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="159.2" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><text x="248" y="18" font-family="Arial" font-size="18" font-weight="bold" fill="#fbbf24" text-anchor="end">+</text></svg><span>H2+</span></div>
+            </label>
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="HeH+">
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><line x1="108.8" y1="50" x2="151.2" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><circle cx="108.8" cy="50" r="18" fill="#fdba74" stroke="#0ea5e9" stroke-width="2"/><text x="108.8" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">He</text><circle cx="151.2" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="151.2" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><text x="248" y="18" font-family="Arial" font-size="18" font-weight="bold" fill="#fbbf24" text-anchor="end">+</text></svg><span>HeH+</span></div>
+            </label>
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="Li+">
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><circle cx="130.0" cy="50" r="24" fill="#c084fc" stroke="#0ea5e9" stroke-width="2"/><text x="130.0" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">Li</text><text x="248" y="18" font-family="Arial" font-size="18" font-weight="bold" fill="#fbbf24" text-anchor="end">+</text></svg><span>Li+</span></div>
+            </label>
+            <label class="mol-label">
+                <input type="radio" name="molecule" value="H4">
+                <div class="mol-card"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 100"><line x1="47.5" y1="50" x2="102.5" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><line x1="102.5" y1="50" x2="157.5" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><line x1="157.5" y1="50" x2="212.5" y2="50" stroke="#64748b" stroke-width="6" stroke-linecap="round"/><circle cx="47.5" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="47.5" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="102.5" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="102.5" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="157.5" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="157.5" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text><circle cx="212.5" cy="50" r="14" fill="#f8fafc" stroke="#0ea5e9" stroke-width="2"/><text x="212.5" y="55" font-family="Arial" font-size="14" font-weight="bold" fill="#0f172a" text-anchor="middle">H</text></svg><span>H4</span></div>
+            </label>
         </div>
 
-        <button onclick="runQuantumAudio()">Spustiť kvantový výpočet</button>
+        <button id="runBtn" type="button">Spustiť kvantový výpočet</button>
 
         <div id="status">Pripravené na spustenie.</div>
-
-        <!-- Prehrávač pre vygenerovaný WAV súbor -->
-        <audio id="audioPlayer" controls style="display: none;"></audio>
+        <pre id="qpeOutput"></pre>
     </div>
-
-    <script>
-        const backgrounds = {
-            "H3+":  "linear-gradient(135deg, #0f172a, #1e3a8a)",
-            "H2":   "linear-gradient(135deg, #0f172a, #065f46)",
-            "H2+":  "linear-gradient(135deg, #0f172a, #6d28d9)",
-            "HeH+": "linear-gradient(135deg, #0f172a, #9d174d)",
-            "Li+":  "linear-gradient(135deg, #0f172a, #b45309)",
-            "H4":   "linear-gradient(135deg, #0f172a, #0e7490)"
-        };
-
-        // Obrázky molekúl (vlastné súbory dáš do priečinka images/)
-        const images = {
-            "H3+":  "images/h3plus.png",
-            "H2":   "images/h2.png",
-            "H2+":  "images/h2.png",
-            "HeH+": "images/hehplus.png",
-            "Li+":  "images/liplus.png",
-            "H4":   "images/h4.png"
-        };
-
-        // Náhradný obrázok, ak súbor neexistuje
-        function placeholder(name) {
-            const svg =
-                `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56">` +
-                `<circle cx="28" cy="28" r="24" fill="#0ea5e9"/>` +
-                `<text x="28" y="33" font-family="Arial" font-size="14" ` +
-                `font-weight="bold" fill="white" text-anchor="middle">${name}</text></svg>`;
-            return "data:image/svg+xml," + encodeURIComponent(svg);
-        }
-
-        function updateMolecule() {
-            const molecule = document.getElementById('moleculeSelect').value;
-            const bg = document.getElementById('bg');
-            const img = document.getElementById('moleculeImg');
-
-            // Obrázok vedľa výberu
-            img.onerror = () => {
-                img.onerror = null;
-                img.src = placeholder(molecule);
-            };
-            img.src = images[molecule];
-
-            // Pozadie s prelínaním
-            bg.classList.add('fade');
-            setTimeout(() => {
-                bg.style.backgroundImage = backgrounds[molecule];
-                bg.classList.remove('fade');
-            }, 400);
-        }
-
-        function runQuantumAudio() {
-            const statusDiv = document.getElementById('status');
-            const molecule = document.getElementById('moleculeSelect').value;
-            const audioPlayer = document.getElementById('audioPlayer');
-
-            statusDiv.textContent = `Počítam obvod pre ${molecule}... (Simulácia)`;
-
-            // Sem neskôr môžete prepojiť backend / API, ktoré spustí Python skript
-            setTimeout(() => {
-                statusDiv.textContent = "Hotovo! Súbor je pripravený.";
-                // audioPlayer.src = "melodia.wav"; // tu sa načte hotový súbor
-                // audioPlayer.style.display = "block";
-            }, 2000);
-        }
-
-        // Nastav obrázok a pozadie hneď po načítaní stránky
-        updateMolecule();
-    </script>
 
 </body>
 </html>

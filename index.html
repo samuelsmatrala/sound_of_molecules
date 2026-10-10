@@ -15,8 +15,22 @@
             height: 100vh;
             margin: 0;
         }
+
+        #bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background-size: cover;
+            background-position: center;
+            transition: opacity 0.4s ease;
+        }
+        #bg.fade {
+            opacity: 0;
+        }
+
         .container {
-            background-color: #1e293b;
+            position: relative;
+            background-color: rgba(30, 41, 59, 0.92);
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
@@ -33,6 +47,28 @@
             font-size: 14px;
             margin-bottom: 20px;
         }
+
+        /* Riadok: výber molekuly + obrázok vedľa neho */
+        .select-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .select-row select {
+            flex: 1;
+            width: auto;
+            margin-top: 0;
+        }
+        #moleculeImg {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
+            border-radius: 8px;
+            background-color: #334155;
+            flex-shrink: 0;
+        }
+
         select, button {
             width: 100%;
             padding: 12px;
@@ -68,19 +104,25 @@
 </head>
 <body>
 
+    <div id="bg"></div>
+
     <div class="container">
         <h1>Musiq Studio</h1>
         <p>Preveďte kvantový obvod na zvuk a melódiu.</p>
 
         <label for="moleculeSelect">Vyberte molekulu:</label>
-        <select id="moleculeSelect">
-            <option value="H3+">H3+</option>
-            <option value="H2">H2</option>
-            <option value="H2+">H2+</option>
-            <option value="HeH+">HeH+</option>
-            <option value="Li+">Li+</option>
-            <option value="H4">H4</option>
-        </select>
+
+        <div class="select-row">
+            <select id="moleculeSelect" onchange="updateMolecule()">
+                <option value="H3+">H3+</option>
+                <option value="H2">H2</option>
+                <option value="H2+">H2+</option>
+                <option value="HeH+">HeH+</option>
+                <option value="Li+">Li+</option>
+                <option value="H4">H4</option>
+            </select>
+            <img id="moleculeImg" src="" alt="Molekula">
+        </div>
 
         <button onclick="runQuantumAudio()">Spustiť kvantový výpočet</button>
 
@@ -91,13 +133,62 @@
     </div>
 
     <script>
+        const backgrounds = {
+            "H3+":  "linear-gradient(135deg, #0f172a, #1e3a8a)",
+            "H2":   "linear-gradient(135deg, #0f172a, #065f46)",
+            "H2+":  "linear-gradient(135deg, #0f172a, #6d28d9)",
+            "HeH+": "linear-gradient(135deg, #0f172a, #9d174d)",
+            "Li+":  "linear-gradient(135deg, #0f172a, #b45309)",
+            "H4":   "linear-gradient(135deg, #0f172a, #0e7490)"
+        };
+
+        // Obrázky molekúl (vlastné súbory dáš do priečinka images/)
+        const images = {
+            "H3+":  "images/h3plus.png",
+            "H2":   "images/h2.png",
+            "H2+":  "images/h2.png",
+            "HeH+": "images/hehplus.png",
+            "Li+":  "images/liplus.png",
+            "H4":   "images/h4.png"
+        };
+
+        // Náhradný obrázok, ak súbor neexistuje
+        function placeholder(name) {
+            const svg =
+                `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56">` +
+                `<circle cx="28" cy="28" r="24" fill="#0ea5e9"/>` +
+                `<text x="28" y="33" font-family="Arial" font-size="14" ` +
+                `font-weight="bold" fill="white" text-anchor="middle">${name}</text></svg>`;
+            return "data:image/svg+xml," + encodeURIComponent(svg);
+        }
+
+        function updateMolecule() {
+            const molecule = document.getElementById('moleculeSelect').value;
+            const bg = document.getElementById('bg');
+            const img = document.getElementById('moleculeImg');
+
+            // Obrázok vedľa výberu
+            img.onerror = () => {
+                img.onerror = null;
+                img.src = placeholder(molecule);
+            };
+            img.src = images[molecule];
+
+            // Pozadie s prelínaním
+            bg.classList.add('fade');
+            setTimeout(() => {
+                bg.style.backgroundImage = backgrounds[molecule];
+                bg.classList.remove('fade');
+            }, 400);
+        }
+
         function runQuantumAudio() {
             const statusDiv = document.getElementById('status');
             const molecule = document.getElementById('moleculeSelect').value;
             const audioPlayer = document.getElementById('audioPlayer');
 
             statusDiv.textContent = `Počítam obvod pre ${molecule}... (Simulácia)`;
-            
+
             // Sem neskôr môžete prepojiť backend / API, ktoré spustí Python skript
             setTimeout(() => {
                 statusDiv.textContent = "Hotovo! Súbor je pripravený.";
@@ -105,6 +196,9 @@
                 // audioPlayer.style.display = "block";
             }, 2000);
         }
+
+        // Nastav obrázok a pozadie hneď po načítaní stránky
+        updateMolecule();
     </script>
 
 </body>

@@ -71,9 +71,9 @@ QPE is run:
 
 Quantum Phase Estimation (QPE) is one of the most fundamental algorithms in quantum information science (for more information, see https://quantum.cloud.ibm.com/learning/en/courses/utility-scale-quantum-computing/quantum-phase-estimation and https://en.wikipedia.org/wiki/Quantum_phase_estimation_algorithm).   Imagine you have a quantum gate (a specific influence on the qubit, often just waiting for a certain amount of time or applying a magnetic field) acting on a quantum state. When applied, it multiplies the state by a phase factor corresponding to e^{2*pi*i*theta} (where the phase theta represents a characteristic property of the quantum state's eigenvalue with a unit modulus). The goal of QPE is to estimate and measure this unknown phase with high precision. Where is it used? QPE rarely stands alone. It serves as a key building block (subroutine) for more advanced algorithms—such as Shor's algorithm for prime factorization or in molecular simulations to calculate energy levels (like the one implemented in our project).
 
-![Sound of Molecules browser interface]("images/QPE_E0_of_H2.png" "QPE for H2 calculating E0 (Ground state)")
+![Sound of Molecules browser interface](images/QPE_E0_of_H2.png "QPE for H2 calculating E0 (ground state)")
 ```text
-example of QPE for H2 calculating E0 (Ground state), quantum circuit visualization 
+example of QPE for H2 calculating E0 (ground state), quantum circuit visualization 
 ```
 
 | Preparation | Implementation |

@@ -125,23 +125,34 @@ Each tone is synthesized as a sine wave with short fade-in and fade-out envelope
 
 ## Architecture
 
-```text
-Selected system
-      |
-      v
-PySCF -> Qiskit Nature -> QPE (three preparations)
-                              |              |
-                              v              v
-                       Energy report    Three energies
-                              |              |
-                              v              v
-                           Browser     Frequency mapping
-                                             |
-Quantum sampling -> 30 indices ------------> sound.py
-                                             |
-                                             v
-                                      Web Audio playback
+```mermaid
+flowchart TD
+    A([Selected system]) --> B[PySCF]
+    B --> C[Qiskit Nature]
+    C --> D[QPE<br/>three preparations]
+ 
+    D --> E[Energy report]
+    D --> F[Three energies]
+ 
+    E --> G([Browser])
+    F --> H[Frequency mapping]
+ 
+    Q[Quantum sampling] --> R[30 indices]
+ 
+    H --> S[sound.py]
+    R --> S
+ 
+    S --> T([Web Audio playback])
+ 
+    classDef io fill:#e8f1ff,stroke:#3b6fd4,stroke-width:1.5px;
+    classDef quantum fill:#f3e8ff,stroke:#8a4fd4,stroke-width:1.5px;
+    classDef audio fill:#e8ffef,stroke:#2f9e5a,stroke-width:1.5px;
+ 
+    class A,G io;
+    class B,C,D,Q,R quantum;
+    class H,S,T audio;
 ```
+
 
 Quantum sampling happens after QPE completes. Both the random indices and the calculated energies are inputs to audio synthesis.
 

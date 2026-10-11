@@ -137,16 +137,16 @@ flowchart TD
     E --> G([Browser])
     F --> H[Frequency mapping]
  
-    Q[Quantum sampling] --> R[30 indices]
+    Q[Quantum sampling] --> R[36 indices]
  
     H --> S[sound.py]
     R --> S
  
     S --> T([Web Audio playback])
  
-    classDef io fill:#e8f1ff,stroke:#3b6fd4,stroke-width:1.5px;
-    classDef quantum fill:#f3e8ff,stroke:#8a4fd4,stroke-width:1.5px;
-    classDef audio fill:#e8ffef,stroke:#2f9e5a,stroke-width:1.5px;
+    classDef io fill:#e8f1ff,stroke:#3b6fd4,stroke-width:1.5px,color:#c2410c;
+    classDef quantum fill:#f3e8ff,stroke:#8a4fd4,stroke-width:1.5px,color:#1d4ed8;
+    classDef audio fill:#e8ffef,stroke:#2f9e5a,stroke-width:1.5px,color:#be123c;
  
     class A,G io;
     class B,C,D,Q,R quantum;

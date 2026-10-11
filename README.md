@@ -1,6 +1,6 @@
 # Sound of Molecules
 
-![Sound of Molecules browser interface](images/sound_of_molecules.png "Sound of Molecules")
+![Sound of Molecules browser interface](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/images/sound_of_molecules.png "Sound of Molecules")
 
 ## Summary
 
@@ -23,7 +23,7 @@ The project is designed to run inside Qollab using **Run with Qollab**.
 ### Runtime Requirements
 
 - A Qollab host that loads `main.js`, exposes the Python module `pythonscripts.main` to JavaScript, and supports `main.callPromising(backend, molecule)`.
-- A Python environment with the packages in [requirements.txt](requirements.txt). These include `qiskit>=2.5.2,<3.0.0`, Qiskit Nature, and PySCF. The source also imports NumPy directly.
+- A Python environment with the packages in [requirements.txt](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/requirements.txt). These include `qiskit>=2.5.2,<3.0.0`, Qiskit Nature, and PySCF. The source also imports NumPy directly.
 - A backend supporting Qiskit transpilation, `run`, job status, and measurement counts. Music sampling additionally requires `run(..., memory=True)` and `get_memory()`.
 - A browser with Web Audio support and permission to play audio.
 
@@ -71,10 +71,8 @@ QPE is run:
 
 Quantum Phase Estimation (QPE) is one of the most fundamental algorithms in quantum information science (for more information, see https://quantum.cloud.ibm.com/learning/en/courses/utility-scale-quantum-computing/quantum-phase-estimation and https://en.wikipedia.org/wiki/Quantum_phase_estimation_algorithm).   Imagine you have a quantum gate (a specific influence on the qubit, often just waiting for a certain amount of time or applying a magnetic field) acting on a quantum state. When applied, it multiplies the state by a phase factor corresponding to $`e^{2\pi i \theta}`$ (where the phase theta represents a characteristic property of the quantum state's eigenvalue with a unit modulus). The goal of QPE is to estimate and measure this unknown phase with high precision. Where is it used? QPE rarely stands alone. It serves as a key building block (subroutine) for more advanced algorithms—such as Shor's algorithm for prime factorization or in molecular simulations to calculate energy levels (like the one implemented in our project).
 
-![Sound of Molecules browser interface](images/QPE_E0_of_H2.png "QPE for H2 calculating E0 (ground state)")
-```text
-example of QPE for H2 calculating E0 (ground state), quantum circuit visualization 
-```
+![Sound of Molecules browser interface](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/images/QPE_E0_of_H2.png "QPE for H2 calculating E0 (ground state)")
+
 
 | Preparation | Implementation |
 | --- | --- |
@@ -86,9 +84,17 @@ The current report labels these results as ground, first excited, and second exc
 
 For each preparation, the code chooses the most frequent six-bit QPE outcome, decodes its phase into an electronic energy estimate, and adds nuclear repulsion to obtain a total energy in Hartree.
 
+### Energy Units (Hartree to Joules)
+
+In quantum chemistry, molecular energies are calculated in **Hartree** ($E_{\text{h}}$). To convert Hartree to SI units (**Joules**):
+
+$$1\text{ Hartree } (E_{\text{h}}) \approx 4.359748 \times 10^{-18}\text{ Joules } (\text{J})$$
+
+$$\text{Energy}_{\text{(Joules)}} = \text{Energy}_{\text{(Hartree)}} \times 4.359748 \times 10^{-18}$$
+
 ### Quantum Circuits
 
-The QPE circuit in [QPE.py](pythonscripts/QPE.py) uses six evaluation qubits in addition to the mapped system qubits:
+The QPE circuit in [QPE.py](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/pythonscripts/QPE.py) uses six evaluation qubits in addition to the mapped system qubits:
 
 1. Prepare the selected starting state on the system qubits.
 2. Apply Hadamard gates to the evaluation qubits.
@@ -103,32 +109,26 @@ electronic_energy = -(2 * pi * phase) / 0.3
 total_energy = electronic_energy + nuclear_repulsion
 ```
 
-The separate sampling circuit in [molecule_frequency.py](pythonscripts/molecule_frequency.py) prepares one qubit with `Ry(pi / 2)` and measures it. It runs three batches of 30 shots and sums their outcomes position by position, producing 30 indices from 0 to 3.
+The separate sampling circuit in [molecule_frequency.py](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/pythonscripts/molecule_frequency.py) prepares one qubit with `Ry(pi / 2)` and measures it. It runs three batches of 30 shots and sums their outcomes position by position, producing 30 indices from 0 to 3.
 
 ### Energy-to-Sound Mapping
 
-[sound.py](pythonscripts/sound.py) maps each of the three total energy estimates to a frequency using a linear scale:
+[sound.py](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/pythonscripts/sound.py) maps each of the three total energy estimates to a frequency using a linear scale:
 
 ```text
 frequency_hz = (energy_hartree + 8) / 7.995 * (329.63 - 82.41) + 82.41
 ```
-![Sound of Molecules browser interface](images/energies.png "Energies of given molecules spread on x axis")
-```text
-Energies of given molecules spread on x axis
-```
-![Sound of Molecules browser interface](images/frequencies.png "Linear transformation of energies into frequencies from 82.41 Hz to 329.63 Hz")
-```text
-Linear transformation of energies into frequencies from 82.41 Hz to 329.63 Hz
-```
+![Sound of Molecules browser interface](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/images/energies.png "Energies of given molecules spread on x axis")
+
+![Sound of Molecules browser interface](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/images/frequencies.png "Linear transformation of energies into frequencies from 82.41 Hz to 329.63 Hz")
+
 The hardcoded input interval is `-8` to `-0.005` Hartree (which is a reserve if some noise occurred), and the target interval is `82.41` Hz (E2 - low guitar string in standard tunning) to `329.63` Hz (E4 - high guitar string in standard tunning). This is not a physical energy-to-frequency conversion. 
 
-Melody is generated by program [molecule_frequency.py](pythonscripts/molecule_frequency.py), which measures 0 and 1 in circuit consisting of one qubit. After measuring given number of times (in our case 36 shots), program does another two executions and creates another 2 lists of ones and zeros, so in total we have (example):
+Melody is generated by program [molecule_frequency.py](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/pythonscripts/molecule_frequency.py), which measures 0 and 1 in circuit consisting of one qubit. After measuring given number of times (in our case 36 shots), program does another two executions and creates another 2 lists of ones and zeros, so in total we have (example):
 
 
-![Sound of Molecules browser interface](images/melody.png "molecule_frequency.py circuit")
-```text
-Circuit for generation of the "melody".
-```
+![Sound of Molecules browser interface](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/images/melody.png "Circuit for generation of the *melody*")
+
 ```python
 [0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,]
 [1,1,0,0,1,1,0,0,1,1,0,1,0,0,0,0,1,0,1,1,0,0,1,1,0,0,1,1,0,1,0,0,0,0,1,0,]
@@ -206,13 +206,13 @@ For a first check, select H2 using the configuration shown above. Exact energy v
 
 | Path | Role |
 | --- | --- |
-| `index.html` | Molecule selection, inline styling, status area, and energy-report display |
-| `main.js` | Host Python bridge calls, interface updates, and Web Audio playback |
-| `pythonscripts/main.py` | Coordinates energy estimation, sampling, and synthesis |
-| `pythonscripts/QPE.py` | System configurations, Hamiltonian mapping, state preparation, and QPE |
-| `pythonscripts/molecule_frequency.py` | Generates random indices through quantum measurements |
-| `pythonscripts/sound.py` | Maps energies to frequencies and generates audio samples |
-| `requirements.txt` | Declared Python dependencies |
+| [index.html](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/index.html) | Molecule selection, inline styling, status area, and energy-report display |
+| [main.js](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/main.js) | Host Python bridge calls, interface updates, and Web Audio playback |
+| [main.py](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/pythonscripts/main.py) | Coordinates energy estimation, sampling, and synthesis |
+| [QPE.py](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/pythonscripts/QPE.py) | System configurations, Hamiltonian mapping, state preparation, and QPE |
+| [molecule_frequency.py](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/pythonscripts/molecule_frequency.py) | Generates random indices through quantum measurements |
+| [sound.py](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/pythonscripts/sound.py) | Maps energies to frequencies and generates audio samples |
+| [requirements.txt](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/requirements.txt) | Declared Python dependencies |
 
 ## Troubleshooting
 
@@ -224,3 +224,33 @@ For a first check, select H2 using the configuration shown above. Exact energy v
 | Calculation takes a long time | Check the backend job status and queue. Three QPE jobs run sequentially; the application has no polling timeout. |
 | Report appears but no sound is heard | Check device volume, site audio permissions, and the browser console for Web Audio errors. |
 
+Our video for download: [Video](https://raw.githubusercontent.com/samuelsmatrala/sound_of_molecules/main/images/video.mp4)
+
+
+## References and Literature
+
+### Quantum Computing and Algorithms
+* **Quantum Phase Estimation (QPE):** 
+  * IBM Quantum Learning – *Quantum Phase Estimation Course*. Available online: [IBM Quantum Learning](https://quantum.cloud.ibm.com/learning/en/courses/utility-scale-quantum-computing/quantum-phase-estimation)[cite: 4]
+  * Nielsen, M. A., & Chuang, I. L. (2010). *Quantum Computation and Quantum Information*. Cambridge University Press. (Fundamental definitions of QPE and operators).
+* **Theoretical Physics and Hamiltonians:**
+  * Wikipedia – *Hamiltonian (quantum mechanics)*. Available online: [Wikipedia](https://en.wikipedia.org/wiki/Hamiltonian_(quantum_mechanics))[cite: 4]
+  * Wikipedia – *Quantum phase estimation algorithm*. Available online: [Wikipedia](https://en.wikipedia.org/wiki/Quantum_phase_estimation_algorithm)[cite: 4]
+
+### Quantum Chemistry and Molecular Systems
+* **Basics of Molecules, Ions, and Energy Levels:**
+  * Wikipedia – *Molecule*. Available online: [Wikipedia](https://en.wikipedia.org/wiki/Molecule)[cite: 4]
+  * Wikipedia – *Ion*. Available online: [Wikipedia](https://en.wikipedia.org/wiki/Ion)[cite: 4]
+  * Wikipedia – *Energy level*. Available online: [Wikipedia](https://en.wikipedia.org/wiki/Energy_level)[cite: 4]
+  * Wikipedia – *Excited state*. Available online: [Wikipedia](https://en.wikipedia.org/wiki/Excited_state)[cite: 4]
+
+### Software Libraries and Ecosystem
+* **Qiskit Nature & Qiskit Ecosystem:**
+  * Qiskit Community – *Qiskit Nature Documentation*. Documentation for mapping fermions to qubits (Parity Mapper) and integration with classical chemical drivers. Available online: [Qiskit Nature Docs](https://qiskit-community.github.io/qiskit-nature/)[cite: 4]
+  * Qiskit – *An open-source SDK for working with quantum computers*. Available online: [Qiskit.org](https://qiskit.org/)
+* **PySCF (Python-based Simulations of Chemistry Framework):**
+  * Sun, Q. et al. (2018). *PySCF: the Python-based simulations of chemistry framework*. Modern Physics C & Journal of Computational Chemistry. (Classical electronic structure calculations and Hartree-Fock state).
+
+### Acknowledgments & AI Assistance
+* **AI-Assisted Development:** 
+  * Large Language Models (LLMs) – Utilized as an AI coding and documentation assistant for structuring code, designing the workflow architecture, and drafting technical documentation.

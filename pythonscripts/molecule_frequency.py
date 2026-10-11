@@ -2,7 +2,7 @@ import numpy as np
 from qiskit import QuantumCircuit
 
 def molecule_frequency(backend):
-  num = 30
+  num = 36
   qc = QuantumCircuit(1, 1)
   qc.ry(np.pi/2,0)
   qc.measure(0, 0)

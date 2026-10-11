@@ -33,6 +33,8 @@ Exact host setup steps, tested Python versions, and a verified list of simulator
 
 ## How It Works
 
+Basic Concepts of Molecules, Ions, and Energy States: What is a molecule and an ion? According to the definition on https://en.wikipedia.org/wiki/Molecule, a molecule is an electrically neutral group of two or more atoms held together by chemical bonds. An ion, on the other hand, is an atom or molecule that has a net electrical charge because the total number of electrons is not equal to the total number of protons https://en.wikipedia.org/wiki/Ion. Many interesting quantum chemical systems—including several evaluated in our project, such as H_3+ or Li+ —are positively charged ions (cations). What does it mean for a molecule or ion to have energy? In quantum mechanics, the energy of bound systems (such as atoms, ions, and molecules) is quantized, meaning it cannot take on any arbitrary value, but only specific discrete values known as energy levels. For more details, check the overview on https://en.wikipedia.org/wiki/Energy_level. The total energy accounts for electron motion, nuclear vibrations, and rotation. What is the ground state? The ground state is the lowest possible energy state of a system, where the molecule or ion naturally rests if no external influence is applied, making it its most stable configuration. According to , this state corresponds to the global minimum of the system's potential energy. How does a molecule or ion reach higher states (Excited states)? When a system absorbs energy from its environment (e.g., through photon absorption, thermal energy, or in our case, by applying specific quantum gates like Pauli-X in a quantum circuit), its electrons or vibrational modes are promoted to a higher energy level. This less stable configuration is called an excited state (more on https://en.wikipedia.org/wiki/Excited_state). In quantum simulations (such as the QPE workflow used in your project), we can purposefully simulate these excited states and measure their exact energy values.
+
 The selected system is sent to Python, where molecular energy estimation runs first, followed by random sequence generation and audio synthesis.
 
 ### Molecular Calculations
@@ -52,7 +54,10 @@ Each system has a configuration containing atomic positions, electrical charge, 
 
 PySCF performs classical electronic-structure calculations to construct an electronic Hamiltonian: the mathematical operator describing electron kinetic energy, attraction between electrons and nuclei, and repulsion between electrons.
 
-The Hamiltonian initially uses fermionic operators. Qiskit Nature converts it into qubit operations using parity mapping:
+The Hamiltonian initially uses fermionic operators. 
+According to https://en.wikipedia.org/wiki/Hamiltonian_(quantum_mechanics), the Hamiltonian is an operator corresponding to the total energy of a system (comprising both kinetic and potential energy of all particles). In quantum chemistry simulations, constructing the molecular Hamiltonian allows us to mathematically describe the interactions between electrons and nuclei, which is essential for determining energy levels like the ground and excited states.
+
+Qiskit Nature (https://qiskit-community.github.io/qiskit-nature/ is an open-source software development kit (SDK) provided within the IBM Quantum ecosystem designed to model quantum mechanical problems. It bridges classical chemical drivers (like PySCF used in our project) with quantum hardware algorithms, handling tasks such as second-quantization transformations, mapping fermion operators to qubits (e.g., using the Parity Mapper with 2-qubit reduction), and preparing initial states like Hartree-Fock.) converts it into qubit operations using parity mapping:
 
 ```python
 mapper = ParityMapper(num_particles=problem.num_particles)
@@ -60,8 +65,11 @@ qubit_op = mapper.map(problem.hamiltonian.second_q_op())
 ```
 
 The resulting Hamiltonian is a weighted sum of Pauli operators `I`, `X`, `Y`, and `Z`. Known particle-number parities allow the mapper to remove two qubits.
+According to https://qiskit-community.github.io/qiskit-nature/, a Parity Mapper is a qubit mapping technique used in quantum chemistry to translate fermionic operators (representing electrons) into qubit operators (Pauli strings) that a quantum computer can execute.
 
-QPE is run for three initial-state preparations:
+QPE is run:
+
+Quantum Phase Estimation (QPE) is one of the most fundamental algorithms in quantum information science (for more information, see https://quantum.cloud.ibm.com/learning/en/courses/utility-scale-quantum-computing/quantum-phase-estimation and https://en.wikipedia.org/wiki/Quantum_phase_estimation_algorithm).   Imagine you have a quantum gate (a specific influence on the qubit, often just waiting for a certain amount of time or applying a magnetic field) acting on a quantum state. When applied, it multiplies the state by a phase factor corresponding to e^{2*pi*i*theta} (where the phase theta represents a characteristic property of the quantum state's eigenvalue with a unit modulus). The goal of QPE is to estimate and measure this unknown phase with high precision. Where is it used? QPE rarely stands alone. It serves as a key building block (subroutine) for more advanced algorithms—such as Shor's algorithm for prime factorization or in molecular simulations to calculate energy levels (like the one implemented in our project).
 
 | Preparation | Implementation |
 | --- | --- |

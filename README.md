@@ -107,8 +107,9 @@ The separate sampling circuit in [molecule_frequency.py](pythonscripts/molecule_
 ```text
 frequency_hz = (energy_hartree + 8) / 7.995 * (329.63 - 82.41) + 82.41
 ```
-
-The assumed input interval is `-8` to `-0.005` Hartree, and the target interval is `82.41` to `329.63` Hz. This is an artistic mapping into an audible range, not a physical energy-to-frequency conversion. The code does not explain the choice of these bounds or clamp values outside them.
+![Sound of Molecules browser interface](images/energies.png "Energies of given molecules spread on x axis")
+![Sound of Molecules browser interface](images/frequncies.png "Linear transformation of energies into frequencies from 82.41 Hz to 329.63 Hz")
+The hardcoded input interval is `-8` to `-0.005` Hartree (which is a reserve if some noise occurred), and the target interval is `82.41` Hz (E2 - low guitar string in standard tunning) to `329.63` Hz (E4 - high guitar string in standard tunning). This is not a physical energy-to-frequency conversion. The code does not explain the choice of these bounds or clamp values outside them.
 
 Each random index selects a rest or one of the mapped frequencies:
 
